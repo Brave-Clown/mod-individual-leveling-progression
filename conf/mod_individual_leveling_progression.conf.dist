@@ -1,0 +1,183 @@
+[worldserver]
+
+###################################################################################################
+# Individual Leveling Progression module
+#
+# Per-character, achievement-gated 1–60 climb. Cap rises only when a phase's PvX
+# requirements are met. Composes with mod-individual-progression at 60.
+#
+# Requires `EnablePlayerSettings = 1` in worldserver.conf — state is stored there.
+#
+# Ships with SPEC production thresholds. To exercise gates faster during dev,
+# temporarily lower the *Required values in the live conf (not the .dist) and
+# run `.ilp reload` — no restart required. The `.ilp dev xp|bg|dungeon|capital`
+# GM helpers also bypass the need for real BGs/dungeons during smoke tests.
+###################################################################################################
+
+# Master switch. 1 = active, 0 = disabled (module loads but does nothing).
+IndividualLevelingProgression.Enable = 1
+
+# Announce the module on player login.
+IndividualLevelingProgression.Announce = 1
+
+# Verbose dev logging + extra info in `.ilp status`.
+IndividualLevelingProgression.Debug = 1
+
+# Default journey flag for newly observed characters (1 = on, 0 = off).
+# Existing characters keep whatever they had stored.
+IndividualLevelingProgression.JourneyDefault = 1
+
+###################################################################################################
+# Category toggles. Bulk-disable a whole requirement category across every gate.
+# Useful for kids' mode (no PvP), profession-free runs, etc. The per-gate values below
+# still apply when a category is on; flipping a category to 0 makes that whole pillar
+# auto-satisfied at every gate. Per-requirement opt-out is also possible by setting any
+# individual *Required = 0.
+###################################################################################################
+
+# Affects Cap 19 WSG, Cap 29 AB, Cap 39 any BG, Cap 49 any BG, Finale AV.
+IndividualLevelingProgression.Require.PvP = 1
+
+# Affects Cap 29 distinct pool, Cap 39 SM wings, Cap 49 dungeons, Finale dungeons.
+IndividualLevelingProgression.Require.Dungeons = 1
+
+# Affects Cap 29 / Cap 39 / Cap 49 / Finale First Aid thresholds.
+IndividualLevelingProgression.Require.FirstAid = 1
+
+# Affects Cap 40 speed-bump (FP + zones), Finale capitals.
+IndividualLevelingProgression.Require.Exploration = 1
+
+###################################################################################################
+# Requirement values. Each block: SPEC production value first (commented), then test default.
+###################################################################################################
+
+# --- Cap 19 -> 20: PvP intro ---
+
+# Warsong Gulch matches (10-19 bracket).
+IndividualLevelingProgression.Cap19.WSGRequired = 10
+
+# --- Cap 29 -> 30: group up ---
+
+# Arathi Basin matches (20-29 bracket).
+IndividualLevelingProgression.Cap29.ABRequired = 10
+
+# Distinct dungeons from SFK / RFK / BFD / WC / VC / Stockades.
+IndividualLevelingProgression.Cap29.DungeonsRequired = 3
+
+# End-boss entry IDs (creature_template), comma-separated. Order = bit position,
+# so APPEND to add a dungeon, never reorder (you'd invalidate everyone's progress).
+# Verified against creature_template on 3.3.5a:
+#   3654 Mutanus the Devourer (WC), 639 Edwin VanCleef (VC), 4275 Archmage Arugal (SFK),
+#   1716 Bazil Thredd (Stockades),  4829 Aku'mai (BFD),       4421 Charlga Razorflank (RFK)
+IndividualLevelingProgression.Cap29.DungeonBossIds = 3654,639,4275,1716,4829,4421
+
+# First Aid skill threshold.
+IndividualLevelingProgression.Cap29.FirstAidRequired = 75
+
+# --- Cap 39 -> 40: halfway hump ---
+
+# Any battlegrounds (30-39 bracket).
+IndividualLevelingProgression.Cap39.BGRequired = 10
+
+# Scarlet Monastery wings (all four: GY / Library / Armory / Cathedral).
+IndividualLevelingProgression.Cap39.SMWingsRequired = 4
+
+# SM wing end-bosses. Cathedral credit fires on Mograine's second death (his final
+# death, after the Whitemane fake-rez cycle), per AC's encounter script:
+#   4543 Bloodmage Thalnos (GY), 6487 Arcanist Doan (Library),
+#   3975 Herod (Armory),         3976 Scarlet Commander Mograine (Cathedral)
+IndividualLevelingProgression.Cap39.SMWingBossIds = 4543,6487,3975,3976
+
+# First Aid skill threshold.
+IndividualLevelingProgression.Cap39.FirstAidRequired = 150
+
+# --- Speed bump at 40: exploration only ---
+
+# Gadgetzan flight path discovered (see FlightPathIds below).
+IndividualLevelingProgression.Cap40.FlightPathsRequired = 1
+
+# Taxi node IDs (TaxiNodes.dbc). SPEC §4: Gadgetzan FP is the Cap 40 trigger.
+# Gadgetzan is neutral so TaxiNodes ships two rows (one per faction routing) —
+# 39 and 40 — and each player only ever has their faction's variant flagged in
+# their taximask. Listing both means either faction satisfies. Any-N semantic:
+# the counter increments per discovered node in this list, so adding more node
+# IDs just gives the player more ways to satisfy the FP pillar.
+IndividualLevelingProgression.Cap40.FlightPathIds = 39,40
+
+# Fully explored zones from the candidate list below. Any-N semantic: the
+# player picks which six (or however many) they finish, not us.
+IndividualLevelingProgression.Cap40.FullZonesRequired = 6
+
+# Candidate "Explore X Zone" achievement IDs. A zone counts as fully explored
+# when its achievement's criteria would have fired (read out of the player's
+# per-character explored bitmask, NOT via the achievement system — so
+# account-shared achievements don't pre-credit alts).
+#
+# Default list: every vanilla Azeroth zone, full stop. EK + Kalimdor.
+# Excludes only Outland, Northrend, and the BC starter zones (Eversong /
+# Ghostlands / Azuremyst / Bloodmyst), which require BC and are out of
+# spirit for a vanilla feel. 40 entries — most Cap-40 characters will only
+# realistically finish the 1-40 zones, but if a player pushes into
+# Winterspring / EPL / Un'Goro / etc. they still get the credit.
+#
+# Order doesn't matter (no bitmask semantics here, unlike capitals/dungeons —
+# this list is just "any-N of these"). Add or remove freely.
+IndividualLevelingProgression.Cap40.FullZoneAchievementIds = 627,728,736,750,760,761,765,766,768,769,770,771,772,773,774,775,776,777,778,779,780,781,782,802,841,842,844,845,846,847,848,849,850,851,852,853,854,855,856,857
+# 627 Dun Morogh        728 Durotar           736 Mulgore           750 The Barrens
+# 760 Alterac Mts       761 Arathi Highlands  765 Badlands          766 Blasted Lands
+# 768 Tirisfal Glades   769 Silverpine        770 W Plaguelands     771 E Plaguelands
+# 772 Hillsbrad         773 The Hinterlands   774 Searing Gorge     775 Burning Steppes
+# 776 Elwynn Forest     777 Deadwind Pass     778 Duskwood          779 Loch Modan
+# 780 Redridge          781 Stranglethorn     782 Swamp of Sorrows  802 Westfall
+# 841 Wetlands          842 Teldrassil        844 Darkshore         845 Ashenvale
+# 846 Thousand Needles  847 Stonetalon        848 Desolace          849 Feralas
+# 850 Dustwallow Marsh  851 Tanaris           852 Azshara           853 Felwood
+# 854 Un'Goro Crater    855 Moonglade         856 Silithus          857 Winterspring
+
+# --- Cap 49 -> 50: last major hump ---
+
+# Any battlegrounds (40-49 bracket).
+IndividualLevelingProgression.Cap49.BGRequired = 10
+
+# Distinct dungeons (Maraudon Orange, Uldaman, Zul'Farrak).
+IndividualLevelingProgression.Cap49.DungeonsRequired = 3
+
+# 12201 Princess Theradras (Maraudon orange), 2748 Archaedas (Uldaman),
+# 7267 Chief Ukorz Sandscalp (Zul'Farrak).
+IndividualLevelingProgression.Cap49.DungeonBossIds = 12201,2748,7267
+
+# First Aid skill threshold.
+IndividualLevelingProgression.Cap49.FirstAidRequired = 225
+
+# --- Finale (level 60, MC attune gate) ---
+
+# Alterac Valley completions (bump to 4 if you want a longer Finale).
+IndividualLevelingProgression.Finale.AVRequired = 3
+
+# Distinct dungeons (BRD, LBRS, UBRS, Strat:UD, Strat:L, Scholo, DM:N, DM:E,
+# DM:W — 9 total, the full vanilla 50-60 raid-warmup tour).
+IndividualLevelingProgression.Finale.DungeonsRequired = 9
+
+# 9 vanilla 50-60 end-bosses (raid-warmup tour):
+#   9019  Emperor Dagran Thaurissan  (BRD)
+#   9568  Overlord Wyrmthalak        (LBRS)
+#   10363 General Drakkisath         (UBRS)
+#   10440 Baron Rivendare            (Stratholme Undead)
+#   10813 Balnazzar                  (Stratholme Live)
+#   1853  Darkmaster Gandling        (Scholomance)
+#   11501 King Gordok                (Dire Maul North)
+#   11492 Alzzin the Wildshaper      (Dire Maul East)
+#   11486 Prince Tortheldrin         (Dire Maul West)
+IndividualLevelingProgression.Finale.DungeonBossIds = 9019,9568,10363,10440,10813,1853,11501,11492,11486
+
+# All six vanilla capitals (SW / IF / Darnassus, Org / TB / Undercity).
+IndividualLevelingProgression.Finale.CapitalsRequired = 6
+
+# Capital zone IDs (AreaTable.dbc). The player's bit is set the first time they
+# enter the zone (OnPlayerUpdateZone). Order = bit position; append-only.
+#   1519 Stormwind, 1537 Ironforge, 1657 Darnassus,
+#   1637 Orgrimmar, 1638 Thunder Bluff, 1497 Undercity.
+IndividualLevelingProgression.Finale.CapitalIds = 1519,1537,1657,1637,1638,1497
+
+# First Aid skill threshold (300 = Artisan; bundles the Triage quest line).
+IndividualLevelingProgression.Finale.FirstAidRequired = 300
