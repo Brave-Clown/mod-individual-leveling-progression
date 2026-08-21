@@ -292,8 +292,8 @@ Shape of the idea:
   the vanilla Cap 29 dungeon pool.
 - **Flight paths:** discover a set of Outland flight paths, using the same
   taxi-bitmask mechanic already used for Gadgetzan at Cap 40.
-- **Signature quest:** the Blade's Edge Mountains Circle of Blood arena questline
-  (the level ~65 "Arena of Blood" event). A distinct, memorable gate in the spirit
+- **Signature quest:** the Nagrand Ring of Blood quest chain (level ~65), a series of
+  arena fights that ends with Mogor the Ogre. A distinct, memorable gate in the spirit
   of the Zul'Farrak and Scarlet Monastery gates. Exact quest and creature IDs to be
   confirmed during implementation.
 - **World PvP:** capture some Outland world-PvP objectives instead of instanced
