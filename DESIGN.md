@@ -270,3 +270,42 @@ The §5 revision landed as designed. It is flagged here only because the section
 was rewritten mid-project. The original design was "rndbots exempt, altbots
 gated"; the shipped rule is all bots exempt. In code this is a single `IsBotOwned`
 helper called at the top of every ILP hook. The rationale is in §5.
+
+---
+
+## 12. Future ideas — a possible TBC tier (61–70)
+
+Nothing in this section is built or committed. It is a place to keep design
+thoughts for a possible Burning Crusade tier so they are not lost. It assumes the
+TBC content itself is present (for example through the IPP fork's TBC progression);
+ILP would sit on top and gate tempo the same way it does at 1–60.
+
+Shape of the idea:
+
+- **No level-70 cap.** The tier would gate the 61–69 climb and then release at 70.
+  The Karazhan attunement chain is a hard enough gate on its own, so the module does
+  not need to add a 70 ceiling. This mirrors the vanilla finale, where the last gate
+  is an attunement rather than a level cap.
+- **Dungeons:** clear some of the Outland leveling 5-mans. Candidate pool: Hellfire
+  Ramparts, The Blood Furnace, The Slave Pens, The Underbog, Mana-Tombs, Auchenai
+  Crypts, Sethekk Halls, Old Hillsbrad Foothills. Same "any N distinct" pattern as
+  the vanilla Cap 29 dungeon pool.
+- **Flight paths:** discover a set of Outland flight paths, using the same
+  taxi-bitmask mechanic already used for Gadgetzan at Cap 40.
+- **Signature quest:** the Blade's Edge Mountains Circle of Blood arena questline
+  (the level ~65 "Arena of Blood" event). A distinct, memorable gate in the spirit
+  of the Zul'Farrak and Scarlet Monastery gates. Exact quest and creature IDs to be
+  confirmed during implementation.
+- **World PvP:** capture some Outland world-PvP objectives instead of instanced
+  battlegrounds. Candidates: the Hellfire Peninsula towers (Overlook, Stadium,
+  Broken Hill) and the Zangarmarsh beacons (Twin Spire Ruins). This gives the TBC
+  tier its own PvP identity, distinct from the vanilla BG gates. Detection would need
+  an OutdoorPvP or objective-capture hook, to be confirmed.
+
+Open questions for whenever this is picked up:
+
+- Which specific dungeons, and how many.
+- How many flight paths, and which ones.
+- Whether world-PvP objective capture is cleanly detectable through an AC hook.
+- Whether a profession thread (First Aid, or another) should keep climbing through 70,
+  or whether the vanilla thread simply ends at 300.

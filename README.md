@@ -156,6 +156,15 @@ Bot population and level distribution are governed entirely by
 [playerbots](https://github.com/mod-playerbots/mod-playerbots) config. See
 [DESIGN.md](DESIGN.md) §5 for the reasoning.
 
+## Roadmap
+
+The module currently covers the 1–60 vanilla climb. A Burning Crusade tier (61–70)
+is an idea under consideration, not a commitment. The current thinking: gate the
+Outland climb with leveling-dungeon clears, Outland flight-path discovery, the
+Blade's Edge "Arena of Blood" quest, and a couple of Outland world-PvP objectives,
+with no level-70 cap (the Karazhan attunement is gate enough). See DESIGN.md §12 for
+details. Feedback and ideas are welcome via issues.
+
 ## Credits
 
 Design and direction by [Brave-Clown](https://github.com/Brave-Clown). Much of
