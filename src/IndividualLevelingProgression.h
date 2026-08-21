@@ -68,11 +68,11 @@ namespace ILP
         std::uint32_t cap39_smWings     = 1;
         std::uint32_t cap39_firstAid    = 50;
         std::uint32_t cap40_flightPaths = 1;
-        std::uint32_t cap40_fullZones   = 1;
+        std::uint32_t cap40_fullZones   = 6;
         std::uint32_t cap49_bg          = 1;
         std::uint32_t cap49_dungeons    = 1;
         std::uint32_t cap49_firstAid    = 75;
-        std::uint32_t finale_av         = 1;
+        std::uint32_t finale_av         = 3;
         std::uint32_t finale_dungeons   = 1;
         std::uint32_t finale_capitals   = 1;
         std::uint32_t finale_firstAid   = 100;

@@ -1,77 +1,91 @@
-<h1 align="center">Individual Leveling Progression (ILP)</h1>
+# Individual Leveling Progression (ILP)
 
-<p align="center">
-  <strong>Per-character, achievement-gated 1&nbsp;→&nbsp;60 for AzerothCore.</strong><br>
-  A deliberate-pace vanilla climb designed to run alongside
-  <a href="https://github.com/ZhengPeiRu21/mod-individual-progression">mod-individual-progression</a>.
-</p>
+Per-character, achievement-gated 1–60 leveling for AzerothCore. A slower, more
+deliberate vanilla climb, built to run alongside
+[mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression)
+(IPP).
 
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="AGPL-3.0"></a>
-  <img src="https://img.shields.io/badge/AzerothCore-WotLK%203.3.5a-red" alt="AC WotLK 3.3.5a">
-  <img src="https://img.shields.io/badge/status-early%20public%20release-orange" alt="Status: early public release">
-</p>
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+![AzerothCore WotLK 3.3.5a](https://img.shields.io/badge/AzerothCore-WotLK%203.3.5a-red)
 
----
+## Overview
 
-## What this is
+ILP holds the level cap at each bracket ceiling (19, 29, 39, 49) until the
+character has met that bracket's requirements. You earn XP normally and fill
+the bar at the cap level; only the level-up into the next level is blocked.
+Once the requirements are met, the cap opens and leveling continues.
 
-ILP holds the pre-60 climb behind per-character requirements at each bracket
-ceiling. You earn XP normally and fill the bar at the cap level; the level-up
-into the next level is blocked until the phase's PvX requirements are met.
-Once cleared, the next cap opens.
+The requirements do not have to be finished at the cap. A player can complete
+them at any point on the way up. Someone who runs battlegrounds, clears the
+listed dungeons, and levels First Aid as they go may reach each cap with the
+work already done and never actually be stopped, and that is fine. The goal is
+to encourage engagement with the world during the climb, not to force a wait at
+a particular level. Done along the way or done at the cap, it counts the same.
 
-The design is IPP's own philosophy pushed down into 1&ndash;60 — a structured,
-self-paced journey. **This is not Season of Discovery.** SoD gates were
-time-based and server-wide. ILP gates are per-character, checked with the
-hooks and bitmasks the server already tracks.
+This is not Season of Discovery. SoD gates were time-based and server-wide; ILP
+gates are per-character and checked against state the server already tracks: XP,
+battleground results, boss kills, exploration and taxi bitmasks, and skill
+values.
 
-At level 60 ILP steps aside and IPP's tier system takes over.
+At level 60 the level gating ends. The only thing ILP still holds shut is the
+Molten Core attunement, which opens once the finale requirements are met. From
+there IPP's tier system takes over.
 
-## Status — early public release, honest about it
+## Status
 
-- All gates are wired and were validated end-to-end on a fresh-toon 1&nbsp;→&nbsp;60
-  playthrough on a private dev server, including the IPP handoff at 60.
-- **It has not yet been used by anyone other than the author.** No live-server
-  playtesting yet, no third-party feedback yet, and the tuning values in the
-  shipped `.conf.dist` are the author's opinionated defaults — expect to
-  retune.
-- Built as a personal project first (see [DESIGN.md](DESIGN.md) for the
-  original intent). Publishing it because it seems solid enough that other
-  people running IPP might get value out of it, not because it's polished.
+Every gate is implemented and was validated end-to-end on a fresh 1–60
+playthrough on a private dev server, including the handoff to IPP at 60. It has
+not been tested on a live server or by anyone other than the author, and the
+values in the shipped `.conf.dist` are the author's defaults, so expect to
+retune for your server. Bug reports are welcome.
 
-Come find issues. That's what a fresh public release is for.
-
-## The phase ladder
+## Phase ladder
 
 | Gate | Cap | PvP | Dungeons | First Aid | Other |
 | --- | --- | --- | --- | --- | --- |
 | 1 | 19 | 10 WSG | — | — | — |
 | 2 | 29 | 10 AB | any 3 distinct (SFK / RFK / BFD / WC / VC / Stocks) | 75 | — |
 | 3 | 39 | 10 any BG | full SM (4 wings) | 150 | reward: mount |
-| 3.5 | 40 (explore only) | — | — | — | Gadgetzan FP + N full zones (any-N-from-list) |
+| 3.5 | 40 (explore only) | — | — | — | Gadgetzan flight path + 6 full zones (any 6 from list) |
 | 4 | 49 | 10 any BG | Maraudon + Uldaman + ZF (Chief Ukorz kill) | 225 | — |
 | Finale | 60 (attune gate) | 3 AV | BRD, LBRS, UBRS, Strat ×2, Scholo, DM ×3 | 300 | all 6 vanilla capitals → MC attune opens |
 
-Values above are the shipped SPEC production thresholds. All are `.conf`-driven
-and can be lowered for testing without a rebuild — see
+Every threshold above is a config value and can be lowered for testing without
+a rebuild. See
 [conf/mod_individual_leveling_progression.conf.dist](conf/mod_individual_leveling_progression.conf.dist)
 for the full list.
 
 ## Composition with IPP
 
-ILP is a **standalone companion** to mod-individual-progression, not a fork.
+ILP is a standalone companion to mod-individual-progression, not a fork.
 
-- ILP owns **tempo** (when the level cap advances).
-- IPP owns **difficulty** (world power scaling, tier progression, restored vanilla content).
-- Both cap XP through the same AC hook; when multiple modules cap XP, the
-  effective cap is the minimum, so the two compose without coordination code.
-- Below 60, ILP binds. At 60, ILP steps aside and IPP's tier gates take over.
+- ILP controls tempo: when the level cap advances.
+- IPP controls difficulty: world power scaling, tier progression, and restored
+  vanilla content.
+- Both cap XP through the same AzerothCore hook. When more than one module caps
+  XP, the effective cap is the lowest of them, so the two work together with no
+  coordination code.
+- Below 60, ILP does the gating. At 60 it steps aside and IPP's tier gates take
+  over.
 
-IPP is a strong recommendation, not a hard dependency — ILP builds and runs
-without it. But the intent is the two together.
+IPP is recommended but not required. ILP builds and runs without it; the two
+together are the intended setup.
 
-## Install
+## Requirements
+
+- AzerothCore WotLK 3.3.5a. Tested against the
+  [mod-playerbots AC fork](https://github.com/mod-playerbots/azerothcore-wotlk)
+  on the `Playerbot` branch. It should build on upstream AzerothCore as well,
+  but that is not actively tested.
+- `EnablePlayerSettings = 1` in `worldserver.conf`. ILP stores per-character
+  state through the PlayerSettings mechanism, the same as IPP.
+- Optional:
+  [mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression),
+  or an actively maintained fork such as
+  [Grimfeather/mod-individual-progression](https://github.com/Grimfeather/mod-individual-progression),
+  installed alongside for the full-journey experience.
+
+## Installation
 
 Standard AzerothCore module install:
 
@@ -85,90 +99,77 @@ make -j$(nproc)
 sudo make install
 ```
 
-CMake picks up the module automatically via the standard modules scan. Copy
-`conf/mod_individual_leveling_progression.conf.dist` to your `etc/modules/`
+CMake picks up the module through the standard modules scan. Copy
+`conf/mod_individual_leveling_progression.conf.dist` into your `etc/modules/`
 directory as `mod_individual_leveling_progression.conf` and edit as needed.
 
-**Requirements:**
+## Configuration
 
-- **AzerothCore WotLK 3.3.5a.** Tested against the [mod-playerbots AC fork](https://github.com/mod-playerbots/azerothcore-wotlk)
-  on the `Playerbot` branch. Should build on upstream AC too, but is not
-  actively tested there.
-- **`EnablePlayerSettings = 1`** in `worldserver.conf` — ILP stores per-character
-  state through the PlayerSettings mechanism (same as IPP).
-- **Optional:** [mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression)
-  (or an actively-maintained fork such as
-  [Grimfeather/mod-individual-progression](https://github.com/Grimfeather/mod-individual-progression))
-  installed alongside for the intended full-journey experience.
+The full config is in
+[conf/mod_individual_leveling_progression.conf.dist](conf/mod_individual_leveling_progression.conf.dist).
+Every threshold, dungeon and creature list, capital, and flight-path list is a
+config value; nothing is hardcoded. You can retune the whole module without
+rebuilding.
+
+Main levers:
+
+- Category toggles (`Require.PvP`, `Require.Dungeons`, `Require.FirstAid`,
+  `Require.Exploration`) disable a whole pillar across every gate. Useful for a
+  kids' mode that skips PvP.
+- Per-gate `*Required` counts set the numeric threshold for each pillar.
+- Boss and creature entry lists are append-only. The position of each entry in
+  the list is the bit position used in the stored per-character bitmask, so
+  reordering silently invalidates existing progress.
 
 ## Runtime commands
 
-- `.ilp status [player]` — full readout of the current gate, every requirement,
-  and per-slot tick lines for multi-bit pillars.
+- `.ilp status [player]` — current gate, every requirement, and per-slot lines
+  for multi-bit pillars.
 - `.ilp reload` — re-read the conf without a worldserver restart.
 - `.ilp set journey <0|1> [player]` — toggle the per-character journey flag.
-- `.ilp skip [player]` — mark a character progression-complete
-  (two-step confirmation, GM-restricted; for utility alts).
-- `.ilp dev xp|bg|dungeon|capital [player]` — dev/GM test helpers so gates can
-  be validated without grinding real BGs and dungeons every time.
+- `.ilp skip [player]` — mark a character progression-complete (two-step
+  confirmation, GM-restricted; for utility alts).
+- `.ilp dev xp|bg|dungeon|capital [player]` — GM test helpers to exercise gates
+  without grinding real battlegrounds and dungeons.
 
 ## Hooks used
 
 For AzerothCore catalogue reference:
 
-- **WorldScript:** `OnAfterConfigLoad`, `OnBeforeWorldInitialized`
-- **PlayerScript:** `OnPlayerLogin`, `OnPlayerGiveXP`, `OnPlayerCreatureKill`,
+- WorldScript: `OnAfterConfigLoad`, `OnBeforeWorldInitialized`
+- PlayerScript: `OnPlayerLogin`, `OnPlayerGiveXP`, `OnPlayerCreatureKill`,
   `OnPlayerUpdateZone`, `OnPlayerMapChanged`, `OnPlayerUpdateSkill`
-- **UnitScript:** `OnUnitDeath` (backstop for kills where the killer isn't a Player
-  — e.g. warlock/hunter pets landing the final blow)
-- **CreatureScript:** Lothos Riftwaker gossip gate (MC attunement)
-- **BGScript:** `OnBattlegroundEnd`
-- **CommandScript:** `.ilp` command tree
+- UnitScript: `OnUnitDeath` (backstop for kills where the killer is not a
+  Player, e.g. a warlock or hunter pet landing the final blow)
+- CreatureScript: Lothos Riftwaker gossip gate (MC attunement)
+- BGScript: `OnBattlegroundEnd`
+- CommandScript: the `.ilp` command tree
 
-CMake hooks: none custom — standard AC modules build.
-
-SQL patches: two, in `data/sql/world/` and `data/sql/characters/`. Applied
-manually via the standard AC updater on module load.
+No custom CMake; standard AzerothCore module build. Two SQL patches ship in
+`data/sql/world/` and `data/sql/characters/`, applied by the standard AC updater
+on module load.
 
 ## Bots
 
-**All bots are exempt from ILP** — no XP cap, no credit tracking, no journey
-flag. Bot population and level distribution are governed entirely by
+All bots are exempt from ILP: no XP cap, no credit tracking, no journey flag.
+Bot population and level distribution are governed entirely by
 [playerbots](https://github.com/mod-playerbots/mod-playerbots) config. See
-[DESIGN.md §5](DESIGN.md) for the rationale.
-
-## Configuration
-
-The full config lives in
-[conf/mod_individual_leveling_progression.conf.dist](conf/mod_individual_leveling_progression.conf.dist).
-Every threshold, every dungeon/creature list, every capital and flight-path
-list is a config value — nothing is hardcoded. That means you can retune the
-entire feel of the module without rebuilding.
-
-Notable levers:
-
-- **Category toggles** (`Require.PvP`, `Require.Dungeons`, `Require.FirstAid`,
-  `Require.Exploration`) — bulk-disable a whole pillar across every gate.
-  Useful for a "kids' mode" that skips PvP entirely.
-- **Per-gate `*Required` counts** — the numeric threshold for each pillar.
-- **Boss/creature entry lists** — treat as **append-only**. The bit position of
-  each entry in the list is the bit position used in the stored per-character
-  bitmask; reordering silently invalidates every player's progress.
+[DESIGN.md](DESIGN.md) §5 for the reasoning.
 
 ## Credits
 
-Authored by [Brave-Clown](https://github.com/Brave-Clown), with heavy use of
-[Claude Code](https://www.anthropic.com/claude-code) as a pair-programmer.
-The design (see [DESIGN.md](DESIGN.md)) is my own; substantial portions of the
-implementation are Claude's work under my direction, and commits use a
-`Co-Authored-By: Claude` trailer for transparency. This is vibe-coding-plus at
-best — read the diffs before you trust the code with your server.
+Design and direction by [Brave-Clown](https://github.com/Brave-Clown). Much of
+the implementation was written with
+[Claude Code](https://www.anthropic.com/claude-code) as a coding assistant,
+under the author's direction; commits carry a `Co-Authored-By: Claude` trailer.
+Read the code before running it on your server.
 
-Design inspiration and companion module: [mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression)
-by ZhengPeiRu21 and its ongoing fork by [Grimfeather](https://github.com/Grimfeather/mod-individual-progression).
-
-Built on top of [AzerothCore](https://github.com/azerothcore/azerothcore-wotlk).
+Inspired by and built to run with
+[mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression)
+by ZhengPeiRu21, and its
+[Grimfeather fork](https://github.com/Grimfeather/mod-individual-progression).
+Built on [AzerothCore](https://github.com/azerothcore/azerothcore-wotlk).
 
 ## License
 
-[AGPL-3.0](LICENSE). Following the AzerothCore catalogue recommendation.
+[AGPL-3.0](LICENSE), following the AzerothCore catalogue recommendation.

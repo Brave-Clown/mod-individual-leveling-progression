@@ -189,11 +189,11 @@ namespace ILP
         s_cfg.cap39_smWings     = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Cap39.SMWingsRequired",     1);
         s_cfg.cap39_firstAid    = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Cap39.FirstAidRequired",    50);
         s_cfg.cap40_flightPaths = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Cap40.FlightPathsRequired", 1);
-        s_cfg.cap40_fullZones   = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Cap40.FullZonesRequired",   1);
+        s_cfg.cap40_fullZones   = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Cap40.FullZonesRequired",   6);
         s_cfg.cap49_bg          = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Cap49.BGRequired",          1);
         s_cfg.cap49_dungeons    = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Cap49.DungeonsRequired",    1);
         s_cfg.cap49_firstAid    = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Cap49.FirstAidRequired",    75);
-        s_cfg.finale_av         = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Finale.AVRequired",         1);
+        s_cfg.finale_av         = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Finale.AVRequired",         3);
         s_cfg.finale_dungeons   = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Finale.DungeonsRequired",   1);
         s_cfg.finale_capitals   = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Finale.CapitalsRequired",   1);
         s_cfg.finale_firstAid   = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Finale.FirstAidRequired",   100);

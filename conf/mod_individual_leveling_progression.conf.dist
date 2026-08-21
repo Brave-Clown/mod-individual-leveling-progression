@@ -48,7 +48,8 @@ IndividualLevelingProgression.Require.FirstAid = 1
 IndividualLevelingProgression.Require.Exploration = 1
 
 ###################################################################################################
-# Requirement values. Each block: SPEC production value first (commented), then test default.
+# Requirement values, shipped at SPEC production thresholds. To test a gate faster,
+# lower its *Required in the live conf (not this .dist) and run `.ilp reload`.
 ###################################################################################################
 
 # --- Cap 19 -> 20: PvP intro ---
@@ -105,7 +106,7 @@ IndividualLevelingProgression.Cap40.FlightPathsRequired = 1
 IndividualLevelingProgression.Cap40.FlightPathIds = 39,40
 
 # Fully explored zones from the candidate list below. Any-N semantic: the
-# player picks which six (or however many) they finish, not us.
+# player picks which six (or however many) they finish, not the module.
 IndividualLevelingProgression.Cap40.FullZonesRequired = 6
 
 # Candidate "Explore X Zone" achievement IDs. A zone counts as fully explored
@@ -113,7 +114,7 @@ IndividualLevelingProgression.Cap40.FullZonesRequired = 6
 # per-character explored bitmask, NOT via the achievement system — so
 # account-shared achievements don't pre-credit alts).
 #
-# Default list: every vanilla Azeroth zone, full stop. EK + Kalimdor.
+# Default list: every vanilla Azeroth zone (Eastern Kingdoms + Kalimdor).
 # Excludes only Outland, Northrend, and the BC starter zones (Eversong /
 # Ghostlands / Azuremyst / Bloodmyst), which require BC and are out of
 # spirit for a vanilla feel. 40 entries — most Cap-40 characters will only
