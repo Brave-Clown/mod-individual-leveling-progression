@@ -309,3 +309,42 @@ Open questions for whenever this is picked up:
 - Whether world-PvP objective capture is cleanly detectable through an AC hook.
 - Whether a profession thread (First Aid, or another) should keep climbing through 70,
   or whether the vanilla thread simply ends at 300.
+
+## 13. Future ideas — configurable profession requirements
+
+Nothing in this section is built or committed either. Today the only profession
+pillar is First Aid, hardcoded as the thread that climbs across the gates. First Aid
+is one of the secondary professions, and it is already tracked through the
+`OnPlayerUpdateSkill` hook, so the plumbing for "watch a skill climb to a threshold"
+exists. The idea here is to open that up so a server can require any profession, or a
+set of them, as a gating pillar.
+
+Shape of the idea:
+
+- **Pick the exact professions, or leave it open.** A server could name specific
+  professions (say, require Blacksmithing and Cooking), or say "any N professions of
+  your choice to skill X," letting the player decide which to level.
+- **Primary and secondary categories.** Model the two profession classes WoW already
+  has — primaries (Mining, Herbalism, Skinning, Blacksmithing, Leatherworking,
+  Tailoring, Engineering, Enchanting, Alchemy) and secondaries (First Aid, Cooking,
+  Fishing) — so requirements can be phrased per category: "N primaries" and "N
+  secondaries," each to its own skill threshold.
+- **Presets and full control.** Ship a few ready-made shapes (for example, one
+  secondary plus one or two primaries) for people who just want something sensible,
+  while still allowing a fully custom list for people who want to name every
+  profession and threshold.
+- **Category toggle, like the others.** A single switch to turn the whole profession
+  pillar on or off at every gate, matching the existing `Require.*` category toggles,
+  so a profession-free run stays a one-line change.
+
+Open questions for whenever this is picked up:
+
+- Whether the requirement is "reach skill X in a chosen profession" or "learn the
+  profession at all," and whether the threshold scales per gate the way First Aid does.
+- How to store per-character progress when the player is free to choose which
+  professions count — a fixed bit list stops working once the set is open, so this
+  likely needs a small learned-set store rather than the bitmask pattern the dungeon
+  and capital pillars use.
+- How this interacts with the existing First Aid thread: fold First Aid into the
+  general profession pillar, or keep it as its own dedicated thread and layer the new
+  one alongside it.

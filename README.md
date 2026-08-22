@@ -163,7 +163,15 @@ is an idea under consideration, not a commitment. The current thinking: gate the
 Outland climb with leveling-dungeon clears, Outland flight-path discovery, the Nagrand
 "Ring of Blood" quest chain, and a couple of Outland world-PvP objectives,
 with no level-70 cap (the Karazhan attunement is gate enough). See DESIGN.md §12 for
-details. Feedback and ideas are welcome via issues.
+details.
+
+A second idea under consideration is configurable profession requirements: today
+First Aid is the only profession pillar and it is hardcoded, but the same tracking
+could be opened up so a server can require any profession, or a chosen number of
+primaries and secondaries, from a preset shape down to a fully custom list. See
+DESIGN.md §13.
+
+Feedback and ideas are welcome via issues.
 
 ## Credits
 
