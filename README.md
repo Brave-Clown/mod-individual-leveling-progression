@@ -1,7 +1,9 @@
 # Individual Leveling Progression (ILP)
 
-Per-character, achievement-gated 1–60 leveling for AzerothCore. A slower, more
-deliberate vanilla climb, built to run alongside
+Per-character, achievement-gated 1–60 leveling for AzerothCore. The level cap
+rises as you take part in the world (battlegrounds, dungeons, exploration,
+professions), so the climb only slows down if you skip past it. Built to run
+alongside
 [mod-individual-progression](https://github.com/ZhengPeiRu21/mod-individual-progression)
 (IPP).
 
@@ -15,12 +17,13 @@ character has met that bracket's requirements. You earn XP normally and fill
 the bar at the cap level; only the level-up into the next level is blocked.
 Once the requirements are met, the cap opens and leveling continues.
 
-The requirements do not have to be finished at the cap. A player can complete
-them at any point on the way up. Someone who runs battlegrounds, clears the
-listed dungeons, and levels First Aid as they go may reach each cap with the
-work already done and never actually be stopped, and that is fine. The goal is
-to encourage engagement with the world during the climb, not to force a wait at
-a particular level. Done along the way or done at the cap, it counts the same.
+The requirements do not have to be finished at the cap; a player can complete
+them at any point on the way up. The point is engagement rather than delay.
+Someone who runs battlegrounds, clears the listed dungeons, and levels First Aid
+as they go will reach each cap with the work already done and never actually be
+stopped. Someone who rushes straight up on XP alone is held at the ceiling until
+they go back and do it. Either way the cap opens on what you have done in the
+world, and time alone never moves it.
 
 This is not Season of Discovery. SoD gates were time-based and server-wide; ILP
 gates are per-character and checked against state the server already tracks: XP,
