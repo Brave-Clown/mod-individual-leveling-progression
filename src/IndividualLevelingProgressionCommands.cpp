@@ -55,15 +55,11 @@ namespace
     // (dungeons, SM wings, capitals) are checked vs unchecked. Label order must
     // match the BossIds / CapitalIds list order in the .dist, which the conf
     // comments already lock as append-only.
-    //
-    // `extraBits` is OR'd into the displayed mask for slots whose state lives
-    // outside the stored PlayerSetting (currently just Cap 49's Carrot/Mallet
-    // bit, synthesized live from Player::IsQuestRewarded).
     void TickLine(ChatHandler* h, Player* p, ILP::SettingIndex idx,
-                  std::vector<char const*> const& labels, uint32 extraBits = 0)
+                  std::vector<char const*> const& labels)
     {
         if (!p || labels.empty()) return;
-        uint32 mask = p->GetPlayerSetting(ILP::SETTINGS_SOURCE, idx).value | extraBits;
+        uint32 mask = p->GetPlayerSetting(ILP::SETTINGS_SOURCE, idx).value;
         std::string line = "    ";
         for (size_t i = 0; i < labels.size(); ++i)
         {

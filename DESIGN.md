@@ -82,11 +82,10 @@ This is a deliberate non-ceiling cap. It carries no PvP requirement, so the brac
 ### Cap 49 → 50 — the last major hump (intentionally heavy)
 
 - PvP: 10 any battleground (40–49 bracket).
-- Dungeons: Maraudon + Uldaman.
-- Group/world quest: the Zul'Farrak Mallet chain. Sacred Mallet, then trek to the Hinterlands to forge the Mallet of Zul'Farrak, then use it to summon Gahz'rilla in ZF (which brings a ZF run along with it). Exact quest steps to be confirmed during implementation.
+- Dungeons: clear Maraudon, Uldaman, and Zul'Farrak. ZF credit fires on the Chief Ukorz Sandscalp kill (see §11 for why this replaced the original Mallet chain).
 - First Aid: 225 (the cap right before the Triage quest).
 
-> Uldaman is in Badlands and ZF ties to the Hinterlands, so there is natural overlap with the exploration pillar if Badlands or Hinterlands are chosen as explore zones.
+> Uldaman is in Badlands and ZF is in Tanaris, so there is natural overlap with the exploration pillar if Badlands or Tanaris are chosen as explore zones.
 
 ### Finale — earn the raid (level 60; not a level cap, purely the MC attunement gate)
 
@@ -163,7 +162,7 @@ Backstop: a lightweight door-check on the Molten Core map entrance for edge case
 | 2   | 29  | 10 AB | any 3 distinct (low pool) | 75  | —   |
 | 3   | 39  | 10 any BG | full SM (4 wings) | 150 | reward: mount |
 | 3.5 | 40 (explore only) | —   | —   | —   | Gadgetzan FP + ~6 full zones (faction-neutral, achievement-criterion check) |
-| 4   | 49  | 10 any BG | Maraudon + Uldaman + ZF (Mallet) | 225 | —   |
+| 4   | 49  | 10 any BG | Maraudon + Uldaman + ZF (Chief Ukorz) | 225 | —   |
 | Finale | 60 (attune gate) | 3 AV | BRD, LBRS, UBRS, Strat ×2, Scholo, DM ×3 | 300 | all 6 capitals → MC attune opens |
 
 ---
