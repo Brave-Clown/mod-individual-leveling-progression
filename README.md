@@ -169,10 +169,12 @@ with no level-70 cap (the Karazhan attunement is gate enough). See DESIGN.md §1
 details.
 
 Also planned is a configurable profession pillar. Today First Aid is the only
-profession requirement. The new pillar adds a count of professions the player must
-raise, with the player choosing which ones: a category mode (primaries only,
+profession requirement. The new pillar runs at the same gates as First Aid
+(Cap 29/39/49/Finale) with the same climbing skill thresholds, and lets a server
+require a number of professions the player chooses: a category mode (primaries only,
 secondaries only, or both) and a required count for each. First Aid keeps its own
-separate thread. It ships off by default. See DESIGN.md §13 for the config shape.
+separate thread and is not one of the selectable professions. It ships off by default.
+See DESIGN.md §13 for the config shape.
 
 Feedback and ideas are welcome via issues.
 

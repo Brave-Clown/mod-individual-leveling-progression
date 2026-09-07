@@ -198,6 +198,15 @@ namespace ILP
         s_cfg.finale_capitals   = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Finale.CapitalsRequired",   1);
         s_cfg.finale_firstAid   = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Finale.FirstAidRequired",   100);
 
+        s_cfg.requireProfessions     = sConfigMgr->GetOption<bool>  ("IndividualLevelingProgression.Require.Professions",              false);
+        s_cfg.professions_mode       = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Professions.Mode",                     3);
+        s_cfg.professions_primary    = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Professions.PrimaryRequired",         1);
+        s_cfg.professions_secondary  = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Professions.SecondaryRequired",       1);
+        s_cfg.professions_cap29Skill  = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Professions.Cap29SkillRequired",    75);
+        s_cfg.professions_cap39Skill  = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Professions.Cap39SkillRequired",   150);
+        s_cfg.professions_cap49Skill  = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Professions.Cap49SkillRequired",   225);
+        s_cfg.professions_finaleSkill = sConfigMgr->GetOption<uint32>("IndividualLevelingProgression.Professions.FinaleSkillRequired", 300);
+
         s_bossMap.clear();
         ParseBossList(sConfigMgr->GetOption<std::string>("IndividualLevelingProgression.Cap29.DungeonBossIds",  ""), GATE_CAP_29);
         ParseBossList(sConfigMgr->GetOption<std::string>("IndividualLevelingProgression.Cap39.SMWingBossIds",   ""), GATE_CAP_39);
@@ -326,6 +335,74 @@ namespace ILP
         return p->GetSkillValue(SKILL_FIRST_AID);
     }
 
+    // The professions this pillar can count. First Aid is deliberately absent: it
+    // keeps its own separate pillar, so only Cooking and Fishing are selectable
+    // secondaries. Jewelcrafting and Inscription are excluded on purpose too — they
+    // are TBC/WotLK professions, outside the vanilla feel.
+    static uint32 const s_primaryProfessions[] = {
+        SKILL_MINING, SKILL_HERBALISM, SKILL_SKINNING,
+        SKILL_BLACKSMITHING, SKILL_LEATHERWORKING, SKILL_TAILORING,
+        SKILL_ENGINEERING, SKILL_ENCHANTING, SKILL_ALCHEMY };
+    static uint32 const s_secondaryProfessions[] = {
+        SKILL_COOKING, SKILL_FISHING };
+
+    static uint32 CountProfessionsAt(Player* p, uint32 const* skills, size_t count, uint32 threshold)
+    {
+        if (!p || threshold == 0) return 0;
+        uint32 raised = 0;
+        for (size_t i = 0; i < count; ++i)
+            if (p->GetSkillValue(skills[i]) >= threshold)
+                ++raised;
+        return raised;
+    }
+
+    uint32 PrimaryProfessionsAt(Player* p, uint32 skillThreshold)
+    {
+        return CountProfessionsAt(p, s_primaryProfessions,
+                                  sizeof(s_primaryProfessions) / sizeof(s_primaryProfessions[0]), skillThreshold);
+    }
+
+    uint32 SecondaryProfessionsAt(Player* p, uint32 skillThreshold)
+    {
+        return CountProfessionsAt(p, s_secondaryProfessions,
+                                  sizeof(s_secondaryProfessions) / sizeof(s_secondaryProfessions[0]), skillThreshold);
+    }
+
+    // Per-gate profession skill threshold, mirroring First Aid's schedule. Gates
+    // without a profession requirement (Cap 19, Cap 40 bump) return 0.
+    uint32 ProfessionSkillRequiredFor(Gate g)
+    {
+        switch (g)
+        {
+            case GATE_CAP_29: return s_cfg.professions_cap29Skill;
+            case GATE_CAP_39: return s_cfg.professions_cap39Skill;
+            case GATE_CAP_49: return s_cfg.professions_cap49Skill;
+            case GATE_FINALE: return s_cfg.professions_finaleSkill;
+            default:          return 0;
+        }
+    }
+
+    bool ProfessionsSatisfied(Player* p, Gate g)
+    {
+        if (!p) return false;
+        Config const& c = s_cfg;
+        if (!c.requireProfessions) return true;
+        uint32 const thr = ProfessionSkillRequiredFor(g);
+        if (thr == 0) return true;  // this gate carries no profession requirement
+        bool const okPrimary   = (c.professions_mode == 2) || PrimaryProfessionsAt(p, thr)   >= c.professions_primary;
+        bool const okSecondary = (c.professions_mode == 1) || SecondaryProfessionsAt(p, thr) >= c.professions_secondary;
+        return okPrimary && okSecondary;
+    }
+
+    bool IsCountedProfession(uint32 skillId)
+    {
+        for (uint32 s : s_primaryProfessions)
+            if (s == skillId) return true;
+        for (uint32 s : s_secondaryProfessions)
+            if (s == skillId) return true;
+        return false;
+    }
+
     uint32 WSGCompleted(Player* p)        { return p ? p->GetPlayerSetting(SETTINGS_SOURCE, SETTING_WSG_COUNT).value      : 0; }
     uint32 ABCompleted(Player* p)         { return p ? p->GetPlayerSetting(SETTINGS_SOURCE, SETTING_AB_COUNT).value       : 0; }
     uint32 Cap39AnyBGCompleted(Player* p) { return p ? p->GetPlayerSetting(SETTINGS_SOURCE, SETTING_CAP39_BG_COUNT).value : 0; }
@@ -367,23 +444,27 @@ namespace ILP
             case GATE_CAP_29:
                 return pvp (ABCompleted(p),        c.cap29_ab)
                     && dung(Cap29DungeonsDone(p),  c.cap29_dungeons)
-                    && fa  (FirstAidSkill(p),      c.cap29_firstAid);
+                    && fa  (FirstAidSkill(p),      c.cap29_firstAid)
+                    && ProfessionsSatisfied(p, g);   // no-op unless Require.Professions = 1
             case GATE_CAP_39:
                 return pvp (Cap39AnyBGCompleted(p), c.cap39_bg)
                     && dung(Cap39SMWingsDone(p),    c.cap39_smWings)
-                    && fa  (FirstAidSkill(p),       c.cap39_firstAid);
+                    && fa  (FirstAidSkill(p),       c.cap39_firstAid)
+                    && ProfessionsSatisfied(p, g);
             case GATE_CAP_40_BUMP:
                 return expl(FlightPathsDiscovered(p), c.cap40_flightPaths)
                     && expl(FullZonesExplored(p),     c.cap40_fullZones);
             case GATE_CAP_49:
                 return pvp (Cap49AnyBGCompleted(p), c.cap49_bg)
                     && dung(Cap49DungeonsDone(p),   c.cap49_dungeons)
-                    && fa  (FirstAidSkill(p),       c.cap49_firstAid);
+                    && fa  (FirstAidSkill(p),       c.cap49_firstAid)
+                    && ProfessionsSatisfied(p, g);
             case GATE_FINALE:
                 return pvp (AVCompleted(p),        c.finale_av)
                     && dung(FinaleDungeonsDone(p), c.finale_dungeons)
                     && expl(CapitalsVisited(p),    c.finale_capitals)
-                    && fa  (FirstAidSkill(p),      c.finale_firstAid);
+                    && fa  (FirstAidSkill(p),      c.finale_firstAid)
+                    && ProfessionsSatisfied(p, g);
             case GATE_COMPLETE:
                 return true;
         }
@@ -624,8 +705,8 @@ public:
         ILP::EnforceMCBackstop(player);
     }
 
-    // First Aid is the only pillar without its own credit hook — skill ticks
-    // happen silently in AC's skill system. Without this hook:
+    // First Aid and the optional profession pillar have no credit hook of their
+    // own — skill ticks happen silently in AC's skill system. Without this hook:
     //   1. At Finale: journey doesn't flip to complete until the next
     //      login/credit-event after FA crosses 300.
     //   2. At Cap 29/39/49: the gate-release announce ("you may now level
@@ -641,23 +722,43 @@ public:
                              uint32 /*max*/, uint32 /*step*/, uint32 newValue) override
     {
         if (!ILP::Cfg().enable || !player) return;
-        if (skillId != SKILL_FIRST_AID) return;
+        // First Aid rides this hook for its own pillar; the counted professions ride
+        // it for the optional profession pillar. Both apply at Cap 29/39/49/Finale.
+        if (skillId != SKILL_FIRST_AID && !ILP::IsCountedProfession(skillId)) return;
         if (ILP::IsBot(player)) return;
         if (!ILP::IsJourney(player) || ILP::IsComplete(player)) return;
 
         ILP::CheckJourneyComplete(player);
 
-        if (!ILP::Cfg().requireFirstAid) return;
-
+        // Work out the threshold this skill-up had to cross to matter at the
+        // player's current gate, so the "you may now level" line fires once on the
+        // closing crossing. Only the capped gates (29/39/49) announce; the Finale
+        // has no level cap and its completion is handled by CheckJourneyComplete
+        // above. First Aid uses its per-gate requirement; professions use the
+        // per-gate profession threshold.
         ILP::Gate g = ILP::CurrentGate(player);
         uint32 req = 0;
-        switch (g)
+        if (skillId == SKILL_FIRST_AID && ILP::Cfg().requireFirstAid)
         {
-            case ILP::GATE_CAP_29: req = ILP::Cfg().cap29_firstAid; break;
-            case ILP::GATE_CAP_39: req = ILP::Cfg().cap39_firstAid; break;
-            case ILP::GATE_CAP_49: req = ILP::Cfg().cap49_firstAid; break;
-            default: return;  // Cap 19 / Cap 40 bump / Finale / Complete — no announce here
+            switch (g)
+            {
+                case ILP::GATE_CAP_29: req = ILP::Cfg().cap29_firstAid; break;
+                case ILP::GATE_CAP_39: req = ILP::Cfg().cap39_firstAid; break;
+                case ILP::GATE_CAP_49: req = ILP::Cfg().cap49_firstAid; break;
+                default: break;
+            }
         }
+        else if (ILP::IsCountedProfession(skillId) && ILP::Cfg().requireProfessions)
+        {
+            switch (g)
+            {
+                case ILP::GATE_CAP_29:
+                case ILP::GATE_CAP_39:
+                case ILP::GATE_CAP_49: req = ILP::ProfessionSkillRequiredFor(g); break;
+                default: break;
+            }
+        }
+
         if (req == 0) return;
         if (!(value < req && newValue >= req)) return;
         if (!ILP::GateSatisfied(player, g)) return;

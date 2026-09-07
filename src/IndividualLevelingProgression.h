@@ -76,6 +76,22 @@ namespace ILP
         std::uint32_t finale_dungeons   = 1;
         std::uint32_t finale_capitals   = 1;
         std::uint32_t finale_firstAid   = 100;
+
+        // Optional profession pillar. Off by default. Enforced at the same gates as
+        // First Aid (Cap 29/39/49/Finale) with per-gate skill thresholds that mirror
+        // First Aid's schedule by default (75/150/225/300). First Aid is NOT one of
+        // the selectable professions — it always keeps its own separate pillar; the
+        // selectable secondaries are Cooking and Fishing. The player picks which
+        // professions to raise; the counts below say how many of each are required.
+        // mode: 1 = primaries only, 2 = secondaries only, 3 = both categories apply.
+        bool          requireProfessions     = false;
+        std::uint32_t professions_mode       = 3;
+        std::uint32_t professions_primary    = 1;
+        std::uint32_t professions_secondary  = 1;
+        std::uint32_t professions_cap29Skill  = 75;
+        std::uint32_t professions_cap39Skill  = 150;
+        std::uint32_t professions_cap49Skill  = 225;
+        std::uint32_t professions_finaleSkill = 300;
     };
 
     Config&       Cfg();
@@ -151,6 +167,19 @@ namespace ILP
     std::uint32_t FullZonesExplored(Player* p);
     std::uint32_t CapitalsVisited(Player* p);
     std::uint32_t FirstAidSkill(Player* p);
+
+    // Profession pillar (Cap 29/39/49/Finale). Counts how many of the player's
+    // professions have reached a skill threshold, computed live from GetSkillValue
+    // with no stored state, the same way First Aid is read. The selectable set is
+    // nine primaries and two secondaries (Cooking, Fishing); First Aid is excluded
+    // because it is its own pillar. ProfessionsSatisfied returns true when the
+    // pillar is disabled or the gate carries no profession requirement, so it can be
+    // AND-ed into the gate check unconditionally.
+    std::uint32_t PrimaryProfessionsAt(Player* p, std::uint32_t skillThreshold);
+    std::uint32_t SecondaryProfessionsAt(Player* p, std::uint32_t skillThreshold);
+    std::uint32_t ProfessionSkillRequiredFor(Gate g);  // per-gate threshold; 0 = no profession req
+    bool          ProfessionsSatisfied(Player* p, Gate g);
+    bool          IsCountedProfession(std::uint32_t skillId);  // selectable set; First Aid excluded
 }
 
 void AddIndividualLevelingProgressionScripts();

@@ -72,6 +72,26 @@ namespace
         h->SendSysMessage(line.c_str());
     }
 
+    // Profession-pillar rows for `.ilp status`. Shown only when the pillar is on
+    // and the current gate carries a profession requirement (Cap 29/39/49/Finale).
+    // cur/req is the count of professions at that gate's skill threshold vs. the
+    // required count; the threshold itself is shown in the label.
+    void ProfessionLines(ChatHandler* h, Player* p, ILP::Gate g)
+    {
+        auto& cfg = ILP::Cfg();
+        if (!cfg.requireProfessions) return;
+        uint32 thr = ILP::ProfessionSkillRequiredFor(g);
+        if (thr == 0) return;
+        if (cfg.professions_mode != 2)
+            h->PSendSysMessage("  Primary professions (>={})   {}{}/{}|r", thr,
+                               ILP::PrimaryProfessionsAt(p, thr) >= cfg.professions_primary ? "|cff4CFF00" : "|cffFF4444",
+                               ILP::PrimaryProfessionsAt(p, thr), cfg.professions_primary);
+        if (cfg.professions_mode != 1)
+            h->PSendSysMessage("  Secondary professions (>={}) {}{}/{}|r", thr,
+                               ILP::SecondaryProfessionsAt(p, thr) >= cfg.professions_secondary ? "|cff4CFF00" : "|cffFF4444",
+                               ILP::SecondaryProfessionsAt(p, thr), cfg.professions_secondary);
+    }
+
     bool HandleStatus(ChatHandler* handler, Optional<PlayerIdentifier> who)
     {
         Player* p = ResolveTarget(handler, who);
@@ -133,6 +153,7 @@ namespace
                 handler->SendSysMessage("  Journey complete. Module no longer gates this character.");
                 break;
         }
+        ProfessionLines(handler, p, g);
         return true;
     }
 
@@ -272,6 +293,12 @@ namespace
                                  c.cap49_bg, c.cap49_dungeons, c.cap49_firstAid);
         handler->PSendSysMessage("Finale AV={} Dungeons={} Capitals={} FirstAid={}",
                                  c.finale_av, c.finale_dungeons, c.finale_capitals, c.finale_firstAid);
+        handler->PSendSysMessage("Professions require={} Mode={} Primary={} Secondary={}",
+                                 c.requireProfessions, c.professions_mode,
+                                 c.professions_primary, c.professions_secondary);
+        handler->PSendSysMessage("Professions skill Cap29={} Cap39={} Cap49={} Finale={}",
+                                 c.professions_cap29Skill, c.professions_cap39Skill,
+                                 c.professions_cap49Skill, c.professions_finaleSkill);
         return true;
     }
 }

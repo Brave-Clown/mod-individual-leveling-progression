@@ -47,6 +47,11 @@ IndividualLevelingProgression.Require.FirstAid = 1
 # Affects Cap 40 speed-bump (FP + zones), Finale capitals.
 IndividualLevelingProgression.Require.Exploration = 1
 
+# Optional profession pillar (Cap 29/39/49/Finale). Off by default; see the
+# Professions section further down for how it works. First Aid is unaffected —
+# it keeps its own FirstAidRequired thresholds regardless of this toggle.
+IndividualLevelingProgression.Require.Professions = 0
+
 ###################################################################################################
 # Requirement values, shipped at SPEC production thresholds. To test a gate faster,
 # lower its *Required in the live conf (not this .dist) and run `.ilp reload`.
@@ -134,6 +139,37 @@ IndividualLevelingProgression.Cap40.FullZoneAchievementIds = 627,728,736,750,760
 # 846 Thousand Needles  847 Stonetalon        848 Desolace          849 Feralas
 # 850 Dustwallow Marsh  851 Tanaris           852 Azshara           853 Felwood
 # 854 Un'Goro Crater    855 Moonglade         856 Silithus          857 Winterspring
+
+# --- Profession pillar (optional; enforced at Cap 29/39/49/Finale, alongside First Aid) ---
+
+# Off by default; turn on with Require.Professions above. The player picks their
+# own professions and raises the required number to each gate's skill threshold,
+# the same gates and thresholds First Aid uses (75/150/225/300). It is read live
+# from the character's skills, so there is no stored progress to migrate — retune
+# and `.ilp reload` freely.
+#
+# Selectable set: nine primaries (Mining, Herbalism, Skinning, Blacksmithing,
+# Leatherworking, Tailoring, Engineering, Enchanting, Alchemy) and two secondaries
+# (Cooking, Fishing). First Aid is NOT selectable here — it always keeps its own
+# separate pillar via the FirstAidRequired values in each gate below.
+
+# Which categories apply: 1 = primaries only, 2 = secondaries only, 3 = both.
+IndividualLevelingProgression.Professions.Mode = 3
+
+# How many professions of each category the player must raise (their choice which).
+# The count is the same at every gate; only the skill threshold climbs. Example
+# "all secondaries plus two primaries": Mode = 3, PrimaryRequired = 2,
+# SecondaryRequired = 2 (there are only two selectable secondaries).
+IndividualLevelingProgression.Professions.PrimaryRequired   = 1
+IndividualLevelingProgression.Professions.SecondaryRequired = 1
+
+# Skill each chosen profession must reach at each gate. Defaults mirror First Aid
+# (75 Journeyman-ish / 150 / 225 Expert / 300 Artisan). Set any to raise/lower a
+# gate independently.
+IndividualLevelingProgression.Professions.Cap29SkillRequired   = 75
+IndividualLevelingProgression.Professions.Cap39SkillRequired   = 150
+IndividualLevelingProgression.Professions.Cap49SkillRequired   = 225
+IndividualLevelingProgression.Professions.FinaleSkillRequired  = 300
 
 # --- Cap 49 -> 50: last major hump ---
 

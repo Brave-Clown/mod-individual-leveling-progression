@@ -309,21 +309,29 @@ Open questions for whenever this is picked up:
 - Whether a profession thread (First Aid, or another) should keep climbing through 70,
   or whether the vanilla thread simply ends at 300.
 
-## 13. Configurable profession requirements (planned)
+## 13. Configurable profession requirements
 
-Not built or committed yet, but the design below is settled and ready to implement.
-Today the only profession requirement is First Aid, hardcoded as a thread that climbs
-across the gates. This adds a second, separate pillar: a count of professions the
-player must raise, with the player choosing which ones. First Aid stays exactly as it
-is; the new pillar sits alongside it.
+An optional profession pillar, off by default. It runs at the **same gates as First
+Aid — Cap 29, 39, 49, and the Finale — with the same climbing skill thresholds**
+(75 → 150 → 225 → 300 by default). The player picks their own professions; at each
+gate the required number of them must have reached that gate's threshold, exactly the
+way First Aid already climbs.
 
 ### What the player must do
 
-The player picks their own professions and raises the required number to a skill
-threshold. The server decides how many primaries and how many secondaries count, and
-whether both categories apply or only one. WoW's profession set is fixed: nine
-primaries (Mining, Herbalism, Skinning, Blacksmithing, Leatherworking, Tailoring,
-Engineering, Enchanting, Alchemy) and three secondaries (First Aid, Cooking, Fishing).
+The player picks which professions to level. The server sets how many primaries and
+how many secondaries count, and whether both categories apply or only one. The count is
+constant across gates; only the skill threshold climbs. So a Cap 29 example of
+"Enchanting + Fishing + First Aid, all to 75" is `Mode = 3, PrimaryRequired = 1,
+SecondaryRequired = 1` (Enchanting the primary, Fishing the secondary) plus First Aid's
+own separate 75.
+
+The selectable set is nine primaries (Mining, Herbalism, Skinning, Blacksmithing,
+Leatherworking, Tailoring, Engineering, Enchanting, Alchemy) and two secondaries
+(Cooking, Fishing). First Aid is deliberately not in this set — it always keeps its own
+separate pillar, so it is never double-counted here. Jewelcrafting and Inscription are
+left out on purpose, for the same vanilla-feel reason the explore list excludes the BC
+zones.
 
 ### Config shape
 
@@ -334,22 +342,24 @@ IndividualLevelingProgression.Require.Professions = 0     # off by default
 # Which categories apply: 1 = primaries only, 2 = secondaries only, 3 = both.
 IndividualLevelingProgression.Professions.Mode = 3
 
-# How many of each the player must raise (their choice which).
+# How many of each the player must raise (their choice which). Same at every gate.
 IndividualLevelingProgression.Professions.PrimaryRequired   = 1
 IndividualLevelingProgression.Professions.SecondaryRequired = 1
 
-# Skill each chosen profession must reach to count. 1 = merely learned.
-IndividualLevelingProgression.Professions.SkillThreshold = 1
+# Skill each chosen profession must reach at each gate (defaults mirror First Aid).
+IndividualLevelingProgression.Professions.Cap29SkillRequired  = 75
+IndividualLevelingProgression.Professions.Cap39SkillRequired  = 150
+IndividualLevelingProgression.Professions.Cap49SkillRequired  = 225
+IndividualLevelingProgression.Professions.FinaleSkillRequired = 300
 ```
 
-The three toggles (`Mode`, `PrimaryRequired`, `SecondaryRequired`) cover every shape
-worth having. Examples:
+Examples:
 
 - Off (default). `Require.Professions = 0`.
-- Any one primary in addition to the existing First Aid thread: `Mode = 1`,
-  `PrimaryRequired = 1`. This is the likely candidate for a future default.
-- All three secondaries plus two primaries: `Mode = 3`, `PrimaryRequired = 2`,
-  `SecondaryRequired = 3`.
+- One primary alongside the First Aid thread: `Mode = 1`, `PrimaryRequired = 1`. The
+  likely candidate for a future default.
+- Both selectable secondaries plus two primaries: `Mode = 3`, `PrimaryRequired = 2`,
+  `SecondaryRequired = 2` (there are only two selectable secondaries).
 
 Naming specific required professions (for example "must be Blacksmithing") is not in
 this design. It can be added later as an optional allow-list without changing the
@@ -357,23 +367,19 @@ count-based core.
 
 ### Storage and detection
 
-This reuses the existing machinery, so there is no new persistence to invent. Because
-the twelve professions are a fixed, known set, the pillar tracks them in a bitmask,
-one bit per profession in a fixed order, exactly like the explore-zone pillar's
-"any N of a fixed list." A bit is set when that profession's skill crosses
-`SkillThreshold`, detected through the `OnPlayerUpdateSkill` hook that First Aid
-already uses. The gate check counts set bits within the primary subset and the
-secondary subset and compares each against its required count, subject to `Mode`.
-
-The earlier worry about needing a "learned-set store" for a player-chosen set does not
-apply: the player chooses which professions to level, but the module can simply track
-all twelve and count the ones that qualify.
+There is no stored state at all. The pillar is computed live: on a gate check it reads
+`GetSkillValue` for each selectable profession and counts how many meet the gate's
+threshold, exactly the way First Aid is read. That sidesteps the storage question
+entirely (no bitmask, no new `PlayerSetting`, nothing to migrate), and a character who
+trains or drops a profession is reflected immediately. `OnPlayerUpdateSkill` is still
+used, but only to fire the "you may now level" announce on the closing skill-up at the
+capped gates; the gate itself needs no hook, since `GateSatisfied` is re-evaluated live
+on every XP grant.
 
 ### Relationship to First Aid
 
 First Aid keeps its own dedicated pillar and its own per-gate thresholds
-(75 / 150 / 225 / 300); the two pillars are independent. Since First Aid can also be
-one of the secondaries a player raises for this pillar, a server that turns both on is
-effectively double-counting First Aid, which is fine and expected. Folding First Aid
-into this pillar entirely is a possible later simplification, deliberately left out of
-v1 to avoid disturbing a thread that already works.
+(75 / 150 / 225 / 300); the two are fully independent, and First Aid is not one of the
+professions this pillar can count, so there is no double-counting. Folding the two into
+a single pillar is a possible later simplification, deliberately left out for now to
+avoid disturbing a thread that already works.
