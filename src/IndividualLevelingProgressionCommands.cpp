@@ -72,6 +72,25 @@ namespace
         h->SendSysMessage(line.c_str());
     }
 
+    // First Aid row. It is a skill-threshold requirement, so it reads "(>=N)"
+    // like the profession rows rather than the "cur/req" of the count-based rows.
+    void FirstAidLine(ChatHandler* h, Player* p, uint32 req, bool enabled)
+    {
+        if (!enabled)
+        {
+            h->PSendSysMessage("  {:<22} |cffAAAAAAdisabled|r", "First Aid");
+            return;
+        }
+        if (req == 0)
+        {
+            h->PSendSysMessage("  {:<22} —", "First Aid");
+            return;
+        }
+        uint32 cur = ILP::FirstAidSkill(p);
+        char const* color = cur >= req ? "|cff4CFF00" : "|cffFF4444";
+        h->PSendSysMessage("  First Aid (>={})       {}{}|r", req, color, cur);
+    }
+
     // Profession-pillar rows for `.ilp status`. Shown only when the pillar is on
     // and the current gate carries a profession requirement (Cap 29/39/49/Finale).
     // cur/req is the count of professions at that gate's skill threshold vs. the
@@ -118,14 +137,14 @@ namespace
                 ReqLine(handler, "Distinct dungeons",   ILP::Cap29DungeonsDone(p),     cfg.cap29_dungeons,   cfg.requireDungeons);
                 TickLine(handler, p, ILP::SETTING_CAP29_DUNGEON_MASK,
                          {"WC", "VC", "SFK", "Stocks", "BFD", "RFK"});
-                ReqLine(handler, "First Aid",           ILP::FirstAidSkill(p),         cfg.cap29_firstAid,   cfg.requireFirstAid);
+                FirstAidLine(handler, p, cfg.cap29_firstAid, cfg.requireFirstAid);
                 break;
             case ILP::GATE_CAP_39:
                 ReqLine(handler, "Battlegrounds (any)", ILP::Cap39AnyBGCompleted(p),   cfg.cap39_bg,         cfg.requirePvP);
                 ReqLine(handler, "Scarlet Monastery",   ILP::Cap39SMWingsDone(p),      cfg.cap39_smWings,    cfg.requireDungeons);
                 TickLine(handler, p, ILP::SETTING_CAP39_SM_MASK,
                          {"GY", "Lib", "Arm", "Cath"});
-                ReqLine(handler, "First Aid",           ILP::FirstAidSkill(p),         cfg.cap39_firstAid,   cfg.requireFirstAid);
+                FirstAidLine(handler, p, cfg.cap39_firstAid, cfg.requireFirstAid);
                 break;
             case ILP::GATE_CAP_40_BUMP:
                 ReqLine(handler, "Gadgetzan FP",        ILP::FlightPathsDiscovered(p), cfg.cap40_flightPaths, cfg.requireExploration);
@@ -136,7 +155,7 @@ namespace
                 ReqLine(handler, "Dungeons",            ILP::Cap49DungeonsDone(p),     cfg.cap49_dungeons,   cfg.requireDungeons);
                 TickLine(handler, p, ILP::SETTING_CAP49_DUNGEON_MASK,
                          {"Maraudon", "Uldaman", "ZF"});
-                ReqLine(handler, "First Aid",           ILP::FirstAidSkill(p),         cfg.cap49_firstAid,   cfg.requireFirstAid);
+                FirstAidLine(handler, p, cfg.cap49_firstAid, cfg.requireFirstAid);
                 break;
             case ILP::GATE_FINALE:
                 ReqLine(handler, "Alterac Valley",      ILP::AVCompleted(p),           cfg.finale_av,        cfg.requirePvP);
@@ -147,7 +166,7 @@ namespace
                 ReqLine(handler, "Capitals visited",    ILP::CapitalsVisited(p),       cfg.finale_capitals,  cfg.requireExploration);
                 TickLine(handler, p, ILP::SETTING_CAPITALS_MASK,
                          {"SW", "IF", "Dar", "Org", "TB", "UC"});
-                ReqLine(handler, "First Aid",           ILP::FirstAidSkill(p),         cfg.finale_firstAid,  cfg.requireFirstAid);
+                FirstAidLine(handler, p, cfg.finale_firstAid, cfg.requireFirstAid);
                 break;
             case ILP::GATE_COMPLETE:
                 handler->SendSysMessage("  Journey complete. Module no longer gates this character.");
