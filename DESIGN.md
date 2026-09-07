@@ -309,41 +309,71 @@ Open questions for whenever this is picked up:
 - Whether a profession thread (First Aid, or another) should keep climbing through 70,
   or whether the vanilla thread simply ends at 300.
 
-## 13. Future ideas — configurable profession requirements
+## 13. Configurable profession requirements (planned)
 
-Nothing in this section is built or committed either. Today the only profession
-pillar is First Aid, hardcoded as the thread that climbs across the gates. First Aid
-is one of the secondary professions, and it is already tracked through the
-`OnPlayerUpdateSkill` hook, so the plumbing for "watch a skill climb to a threshold"
-exists. The idea here is to open that up so a server can require any profession, or a
-set of them, as a gating pillar.
+Not built or committed yet, but the design below is settled and ready to implement.
+Today the only profession requirement is First Aid, hardcoded as a thread that climbs
+across the gates. This adds a second, separate pillar: a count of professions the
+player must raise, with the player choosing which ones. First Aid stays exactly as it
+is; the new pillar sits alongside it.
 
-Shape of the idea:
+### What the player must do
 
-- **Pick the exact professions, or leave it open.** A server could name specific
-  professions (say, require Blacksmithing and Cooking), or say "any N professions of
-  your choice to skill X," letting the player decide which to level.
-- **Primary and secondary categories.** Model the two profession classes WoW already
-  has — primaries (Mining, Herbalism, Skinning, Blacksmithing, Leatherworking,
-  Tailoring, Engineering, Enchanting, Alchemy) and secondaries (First Aid, Cooking,
-  Fishing) — so requirements can be phrased per category: "N primaries" and "N
-  secondaries," each to its own skill threshold.
-- **Presets and full control.** Ship a few ready-made shapes (for example, one
-  secondary plus one or two primaries) for people who just want something sensible,
-  while still allowing a fully custom list for people who want to name every
-  profession and threshold.
-- **Category toggle, like the others.** A single switch to turn the whole profession
-  pillar on or off at every gate, matching the existing `Require.*` category toggles,
-  so a profession-free run stays a one-line change.
+The player picks their own professions and raises the required number to a skill
+threshold. The server decides how many primaries and how many secondaries count, and
+whether both categories apply or only one. WoW's profession set is fixed: nine
+primaries (Mining, Herbalism, Skinning, Blacksmithing, Leatherworking, Tailoring,
+Engineering, Enchanting, Alchemy) and three secondaries (First Aid, Cooking, Fishing).
 
-Open questions for whenever this is picked up:
+### Config shape
 
-- Whether the requirement is "reach skill X in a chosen profession" or "learn the
-  profession at all," and whether the threshold scales per gate the way First Aid does.
-- How to store per-character progress when the player is free to choose which
-  professions count — a fixed bit list stops working once the set is open, so this
-  likely needs a small learned-set store rather than the bitmask pattern the dungeon
-  and capital pillars use.
-- How this interacts with the existing First Aid thread: fold First Aid into the
-  general profession pillar, or keep it as its own dedicated thread and layer the new
-  one alongside it.
+```
+# Master toggle for the pillar, matching the other Require.* switches.
+IndividualLevelingProgression.Require.Professions = 0     # off by default
+
+# Which categories apply: 1 = primaries only, 2 = secondaries only, 3 = both.
+IndividualLevelingProgression.Professions.Mode = 3
+
+# How many of each the player must raise (their choice which).
+IndividualLevelingProgression.Professions.PrimaryRequired   = 1
+IndividualLevelingProgression.Professions.SecondaryRequired = 1
+
+# Skill each chosen profession must reach to count. 1 = merely learned.
+IndividualLevelingProgression.Professions.SkillThreshold = 1
+```
+
+The three toggles (`Mode`, `PrimaryRequired`, `SecondaryRequired`) cover every shape
+worth having. Examples:
+
+- Off (default). `Require.Professions = 0`.
+- Any one primary in addition to the existing First Aid thread: `Mode = 1`,
+  `PrimaryRequired = 1`. This is the likely candidate for a future default.
+- All three secondaries plus two primaries: `Mode = 3`, `PrimaryRequired = 2`,
+  `SecondaryRequired = 3`.
+
+Naming specific required professions (for example "must be Blacksmithing") is not in
+this design. It can be added later as an optional allow-list without changing the
+count-based core.
+
+### Storage and detection
+
+This reuses the existing machinery, so there is no new persistence to invent. Because
+the twelve professions are a fixed, known set, the pillar tracks them in a bitmask,
+one bit per profession in a fixed order, exactly like the explore-zone pillar's
+"any N of a fixed list." A bit is set when that profession's skill crosses
+`SkillThreshold`, detected through the `OnPlayerUpdateSkill` hook that First Aid
+already uses. The gate check counts set bits within the primary subset and the
+secondary subset and compares each against its required count, subject to `Mode`.
+
+The earlier worry about needing a "learned-set store" for a player-chosen set does not
+apply: the player chooses which professions to level, but the module can simply track
+all twelve and count the ones that qualify.
+
+### Relationship to First Aid
+
+First Aid keeps its own dedicated pillar and its own per-gate thresholds
+(75 / 150 / 225 / 300); the two pillars are independent. Since First Aid can also be
+one of the secondaries a player raises for this pillar, a server that turns both on is
+effectively double-counting First Aid, which is fine and expected. Folding First Aid
+into this pillar entirely is a possible later simplification, deliberately left out of
+v1 to avoid disturbing a thread that already works.
