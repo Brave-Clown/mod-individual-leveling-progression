@@ -68,8 +68,9 @@ ILP is a standalone companion to mod-individual-progression, not a fork.
 - Both cap XP through the same AzerothCore hook. When more than one module caps
   XP, the effective cap is the lowest of them, so the two work together with no
   coordination code.
-- Below 60, ILP does the gating. At 60 it steps aside and IPP's tier gates take
-  over.
+- Below 60, ILP gates leveling. At 60 it still holds the Molten Core attunement
+  shut until the finale requirements are met; only once they are does ILP step
+  aside for good and leave IPP's tier gates in control.
 
 IPP is recommended but not required. ILP builds and runs without it; the two
 together are the intended setup.
