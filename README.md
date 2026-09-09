@@ -48,7 +48,7 @@ retune for your server. Bug reports are welcome.
 | --- | --- | --- | --- | --- | --- |
 | 1 | 19 | 10 WSG | — | — | — |
 | 2 | 29 | 10 AB | any 3 distinct (SFK / RFK / BFD / WC / VC / Stocks) | 75 | — |
-| 3 | 39 | 10 any BG | full SM (4 wings) | 150 | reward: mount |
+| 3 | 39 | 10 any BG | full SM (4 wings) | 150 | — |
 | 3.5 | 40 (explore only) | — | — | — | Gadgetzan flight path + 6 full zones (any 6 from list) |
 | 4 | 49 | 10 any BG | Maraudon + Uldaman + ZF (Chief Ukorz kill) | 225 | — |
 | Finale | 60 (attune gate) | 3 AV | BRD, LBRS, UBRS, Strat ×2, Scholo, DM ×3 | 300 | all 6 vanilla capitals → MC attune opens |
