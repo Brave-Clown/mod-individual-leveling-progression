@@ -64,7 +64,7 @@ Caps sit on bracket ceilings (19 / 29 / 39 / 49) so the required PvP for each ph
 
 > The 3-distinct-dungeon rule doubles as the grouping requirement (no separate group quest needed) and solves faction distance for free, since each side runs whatever is nearby.
 
-### Cap 39 → 40 — the halfway hump (reward: ding 40 + riding skill + a mount)
+### Cap 39 → 40 — the halfway hump
 
 - PvP: 10 any battleground (30–39 bracket).
 - Dungeon: full Scarlet Monastery, all four wings. End bosses: Graveyard (Bloodmage Thalnos), Library (Arcanist Doan), Armory (Herod), Cathedral (Scarlet Commander Mograine and High Inquisitor Whitemane).
@@ -72,7 +72,7 @@ Caps sit on bracket ceilings (19 / 29 / 39 / 49) so the required PvP for each ph
 
 ### Speed-bump at 40 — the world opens (exploration only; held at 40 until cleared)
 
-This is a deliberate non-ceiling cap. It carries no PvP requirement, so the bracket-floor problem never applies: exploring at 40 is no harder than at 49. It ties to the mount the player just earned.
+This is a deliberate non-ceiling cap. It carries no PvP requirement, so the bracket-floor problem never applies: exploring at 40 is no harder than at 49. It also pairs with mounted travel, which players already have by this point (the module does not grant a mount; normal riding covers it).
 
 - Flight path: Gadgetzan only (mandatory, shared). Kept simple on purpose: no per-faction far landmark, no breadth requirement.
 - Full-zone exploration: any 6 fully explored zones from a shared candidate list (production target; tunable). The idea is that players naturally over-explore the zones they are already passing through during 10–40 leveling, so requiring 6 from a generous list nudges them to finish what they have already been in rather than forcing trips to new far zones. It is a soft nudge, not a wall. The list is faction-neutral (anyone can explore any zone the engine lets them survive in); friendly-faction bias is enforced naturally by the level and guard mismatch, not by the module.
@@ -160,7 +160,7 @@ Backstop: a lightweight door-check on the Molten Core map entrance for edge case
 | --- | --- | --- | --- | --- | --- |
 | 1   | 19  | 10 WSG | —   | —   | —   |
 | 2   | 29  | 10 AB | any 3 distinct (low pool) | 75  | —   |
-| 3   | 39  | 10 any BG | full SM (4 wings) | 150 | reward: mount |
+| 3   | 39  | 10 any BG | full SM (4 wings) | 150 | —   |
 | 3.5 | 40 (explore only) | —   | —   | —   | Gadgetzan FP + ~6 full zones (faction-neutral, achievement-criterion check) |
 | 4   | 49  | 10 any BG | Maraudon + Uldaman + ZF (Chief Ukorz) | 225 | —   |
 | Finale | 60 (attune gate) | 3 AV | BRD, LBRS, UBRS, Strat ×2, Scholo, DM ×3 | 300 | all 6 capitals → MC attune opens |

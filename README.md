@@ -124,6 +124,12 @@ Main levers:
 - Boss and creature entry lists are append-only. The position of each entry in
   the list is the bit position used in the stored per-character bitmask, so
   reordering silently invalidates existing progress.
+- An optional profession pillar (`Require.Professions`, off by default) runs at
+  the same gates as First Aid (Cap 29/39/49/Finale) with matching climbing skill
+  thresholds. It requires a number of professions the player chooses — a category
+  mode (primaries only, secondaries only, or both) and a required count for each.
+  First Aid keeps its own separate pillar and is not one of the selectable
+  professions. See DESIGN.md §13.
 
 ## Runtime commands
 
@@ -168,14 +174,6 @@ Outland climb with leveling-dungeon clears, Outland flight-path discovery, the N
 "Ring of Blood" quest chain, and a couple of Outland world-PvP objectives,
 with no level-70 cap (the Karazhan attunement is gate enough). See DESIGN.md §12 for
 details.
-
-Also planned is a configurable profession pillar. Today First Aid is the only
-profession requirement. The new pillar runs at the same gates as First Aid
-(Cap 29/39/49/Finale) with the same climbing skill thresholds, and lets a server
-require a number of professions the player chooses: a category mode (primaries only,
-secondaries only, or both) and a required count for each. First Aid keeps its own
-separate thread and is not one of the selectable professions. It ships off by default.
-See DESIGN.md §13 for the config shape.
 
 Feedback and ideas are welcome via issues.
 
